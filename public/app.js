@@ -394,7 +394,7 @@ async function viewJournal(el) {
   </header>
   <section class="grid-2">
     <form id="journalForm" class="card form">
-      <h3>Wareysi maanta</h3>
+      <h3>Wardiga maanta</h3>
       <input name="date" type="date" value="${todayStr()}" required>
       <select name="mood">
         <option value="">Mood-ka (ikhtiyaari)</option>
