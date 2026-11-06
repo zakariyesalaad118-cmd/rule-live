@@ -1,13 +1,16 @@
 {
-  "name": "nolol-maamul",
-  "version": "1.0.0",
-  "description": "Nidaam maamul nolosha maalinta ah: lacagta, jadwalka, wardiga iyo admin",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "license": "MIT"
+"name": "nolol-maamul",
+"version": "1.0.0",
+"description": "Nidaam maamul nolosha maalinta ah: lacagta, jadwalka, wardiga iyo admin",
+"main": "server.js",
+"scripts": {
+"start": "node server.js"
+},
+"dependencies": {
+"mongodb": "^6.20.0"
+},
+"engines": {
+"node": ">=18"
+},
+"license": "MIT"
 }
