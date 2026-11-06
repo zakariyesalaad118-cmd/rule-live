@@ -385,6 +385,64 @@ async function viewSchedule(el) {
 }
 
 // ---------- Journal (wardiga) ----------
+/* ---------- Tasbiixda (adkaarta maalinlaha ah) ---------- */
+const DHIKR_LIST = [
+  { id: 'subhanallah',    name: 'Subhaanallaah',              target: 33 },
+  { id: 'alhamdulillah',  name: 'Alxamdulillaah',             target: 33 },
+  { id: 'allahuakbar',    name: 'Allaahu akbar',              target: 34 },
+  { id: 'astaghfirullah', name: 'Astaghfirullaah',            target: 100 },
+  { id: 'lailaha',        name: 'Laa ilaha illallaah',        target: 100 },
+  { id: 'salawat',        name: 'Salawaadka Nabiga (SCW)',    target: 100 }
+];
+
+function dhikrStore() {
+  const raw = localStorage.getItem('nolol_dhikr_' + todayStr());
+  return raw ? JSON.parse(raw) : {};
+}
+
+function saveDhikr(data) {
+  localStorage.setItem('nolol_dhikr_' + todayStr(), JSON.stringify(data));
+}
+
+function renderDhikr(container) {
+  const data = dhikrStore();
+  container.innerHTML = `
+  <div class="card dhikr-card">
+    <h3>📿 Tasbiixda maanta</h3>
+    <p class="muted">Xogtan waxa lagu kaydiyaa browser-kaaga maanta.</p>
+    ${DHIKR_LIST.map(d => {
+      const count = data[d.id] || 0;
+      const done = count >= d.target;
+      const pct = Math.min(100, Math.round((count / d.target) * 100));
+      return `
+      <div class="dhikr-row ${done ? 'done' : ''}">
+        <div class="dhikr-info">
+          <strong>${d.name} ${done ? '✅' : ''}</strong>
+          <small>${count} / ${d.target}</small>
+          <div class="bar"><i style="width:${pct}%"></i></div>
+        </div>
+        <div class="dhikr-btns">
+          <button class="btn small" data-dhikr="${d.id}" data-step="1">+1</button>
+          <button class="btn small outline" data-dhikr="${d.id}" data-step="-1">−1</button>
+          <button class="btn small outline" data-dhikr="${d.id}" data-step="reset">↺</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  container.querySelectorAll('[data-dhikr]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.dhikr;
+      const step = btn.dataset.step;
+      const data = dhikrStore();
+      data[id] = step === 'reset' ? 0 : Math.max(0, (data[id] || 0) + Number(step));
+      saveDhikr(data);
+      renderDhikr(container);
+    };
+  });
+}
+
+/* ---------- Wardiga ---------- */
 async function viewJournal(el) {
   const { entries } = await api('GET', '/api/journal');
 
@@ -393,8 +451,9 @@ async function viewJournal(el) {
     <div><h2>Wardiga</h2><p class="muted">Maalin kasta qor waxa dhacay iyo sida aad dareento</p></div>
   </header>
   <section class="grid-2">
+    <div id="dhikrBox"></div>
     <form id="journalForm" class="card form">
-      <h3>Wardiga maanta</h3>
+      <h3>Wareysi maanta</h3>
       <input name="date" type="date" value="${todayStr()}" required>
       <select name="mood">
         <option value="">Mood-ka (ikhtiyaari)</option>
@@ -404,7 +463,7 @@ async function viewJournal(el) {
         <option value="😤 Cadho">😤 Cadho</option>
         <option value="🙏 Shukri">🙏 Shukri</option>
       </select>
-      <textarea name="text" rows="7" placeholder="Maanta waxa dhacay..." required></textarea>
+      <textarea name="text" rows="6" placeholder="Maanta waxa dhacay..." required></textarea>
       <button class="btn primary">Kaydi</button>
     </form>
     <div class="card">
@@ -419,6 +478,8 @@ async function viewJournal(el) {
         </article>`).join('') || '<p class="muted">Weli wardi ma qorin.</p>'}
     </div>
   </section>`;
+
+  renderDhikr(document.getElementById('dhikrBox'));
 
   $('#journalForm').onsubmit = e => {
     e.preventDefault();
