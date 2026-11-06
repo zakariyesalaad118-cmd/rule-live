@@ -220,3 +220,44 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
   .grid-2 { grid-template-columns: 1fr; }
   .bar-row { grid-template-columns: 90px 1fr 80px; }
 }
+/* ===== Mobile fixes ===== */
+html, body { overflow-x: hidden; max-width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+.shell, .main, .card, .grid-2 > *, .stats > * { min-width: 0; max-width: 100%; }
+input, select, textarea, button { max-width: 100%; }
+.table-wrap { width: 100%; }
+
+@media (max-width: 800px) {
+  .shell { display: block; }
+  .sidebar { position: static; height: auto; }
+  .main { padding: 16px; }
+  .page-head h2 { font-size: 22px; }
+  .card { padding: 16px; border-radius: 14px; }
+  .grid-2 { grid-template-columns: 1fr !important; gap: 14px; }
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat strong { font-size: 18px; }
+  .form.inline { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 1fr; gap: 4px; }
+  .wallet-grid { grid-template-columns: 1fr 1fr; }
+  .dhikr-row { flex-direction: column; align-items: stretch; }
+}
+
+/* ===== Dashboard qurxin ===== */
+.page-head h2 { letter-spacing: -0.02em; }
+.stat { background: linear-gradient(180deg, #ffffff, #fbfbff); }
+.stat small { text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; }
+.card h3 { display: flex; align-items: center; gap: 8px; }
+.list-row:hover, .entry:hover { background: #fafbff; border-radius: 10px; }
+
+/* ===== Tasbiixda ===== */
+.dhikr-card { display: grid; gap: 12px; }
+.dhikr-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 14px;
+}
+.dhikr-row.done { background: #ecfdf3; border-color: #b7ebcb; }
+.dhikr-info { flex: 1; display: grid; gap: 4px; min-width: 0; }
+.dhikr-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.btn.small { padding: 8px 12px; font-size: 14px; }
+.btn.outline { background: transparent; border: 1px solid var(--line); }
