@@ -384,34 +384,33 @@ async function viewSchedule(el) {
   });
 }
 
-// ---------- Journal (wardiga) ----------
-/* ---------- Tasbiixda (adkaarta maalinlaha ah) ---------- */
+// ---------- Tasbiixda (adkaarta maalinlaha ah, server-ka ku kaydsan) ----------
 const DHIKR_LIST = [
-  { id: 'subhanallah',    name: 'Subhaanallaah',              target: 33 },
-  { id: 'alhamdulillah',  name: 'Alxamdulillaah',             target: 33 },
-  { id: 'allahuakbar',    name: 'Allaahu akbar',              target: 34 },
-  { id: 'astaghfirullah', name: 'Astaghfirullaah',            target: 100 },
-  { id: 'lailaha',        name: 'Laa ilaha illallaah',        target: 100 },
-  { id: 'salawat',        name: 'Salawaadka Nabiga (SCW)',    target: 100 }
+  { id: 'subhanallah',    name: 'Subhaanallaah',           target: 33 },
+  { id: 'alhamdulillah',  name: 'Alxamdulillaah',          target: 33 },
+  { id: 'allahuakbar',    name: 'Allaahu akbar',           target: 34 },
+  { id: 'astaghfirullah', name: 'Astaghfirullaah',         target: 100 },
+  { id: 'lailaha',        name: 'Laa ilaha illallaah',     target: 100 },
+  { id: 'salawat',        name: 'Salawaadka Nabiga (SCW)', target: 100 }
 ];
 
-function dhikrStore() {
-  const raw = localStorage.getItem('nolol_dhikr_' + todayStr());
-  return raw ? JSON.parse(raw) : {};
+async function renderDhikr(container) {
+  container.innerHTML = '<div class="card dhikr-card"><p class="muted">Wuu soo raraya...</p></div>';
+  try {
+    const { counts } = await api('GET', '/api/dhikr');
+    drawDhikr(container, counts);
+  } catch (e) {
+    container.innerHTML = `<div class="card"><p class="bad">${esc(e.message)}</p></div>`;
+  }
 }
 
-function saveDhikr(data) {
-  localStorage.setItem('nolol_dhikr_' + todayStr(), JSON.stringify(data));
-}
-
-function renderDhikr(container) {
-  const data = dhikrStore();
+function drawDhikr(container, counts) {
   container.innerHTML = `
   <div class="card dhikr-card">
     <h3>📿 Tasbiixda maanta</h3>
-    <p class="muted">Xogtan waxa lagu kaydiyaa browser-kaaga maanta.</p>
+    <p class="muted">Tirada waxaa lagu kaydiyaa akoonkaaga, sidaas darteed telefoon iyo kombiyuutar isku mid bay yihiin.</p>
     ${DHIKR_LIST.map(d => {
-      const count = data[d.id] || 0;
+      const count = counts[d.id] || 0;
       const done = count >= d.target;
       const pct = Math.min(100, Math.round((count / d.target) * 100));
       return `
@@ -431,18 +430,24 @@ function renderDhikr(container) {
   </div>`;
 
   container.querySelectorAll('[data-dhikr]').forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       const id = btn.dataset.dhikr;
       const step = btn.dataset.step;
-      const data = dhikrStore();
-      data[id] = step === 'reset' ? 0 : Math.max(0, (data[id] || 0) + Number(step));
-      saveDhikr(data);
-      renderDhikr(container);
+      const next = { ...counts };
+      next[id] = step === 'reset' ? 0 : Math.max(0, (next[id] || 0) + Number(step));
+      btn.disabled = true;
+      try {
+        const r = await api('PUT', '/api/dhikr', { date: todayStr(), counts: next });
+        drawDhikr(container, r.counts);
+      } catch (e) {
+        toast(e.message, 'bad');
+        btn.disabled = false;
+      }
     };
   });
 }
 
-/* ---------- Wardiga ---------- */
+// ---------- Wardiga ----------
 async function viewJournal(el) {
   const { entries } = await api('GET', '/api/journal');
 
