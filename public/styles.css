@@ -221,6 +221,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
   .bar-row { grid-template-columns: 90px 1fr 80px; }
 }
 /* ===== Mobile fixes ===== */
+/* ===== Mobile fixes ===== */
 html, body { overflow-x: hidden; max-width: 100%; }
 *, *::before, *::after { box-sizing: border-box; }
 .shell, .main, .card, .grid-2 > *, .stats > * { min-width: 0; max-width: 100%; }
