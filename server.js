@@ -1149,8 +1149,33 @@ route('DELETE', '/api/admin/users/:id', async ({ req, params }) => {
   return {
     body: { ok: true }
   };
+
+
 });
 
+// ---- Tasbiixda (adkaarta maalinlaha ah) — maalin kasta counts-ka waa la kaydiyaa
+const DHIKR_IDS = ['subhanallah', 'alhamdulillah', 'allahuakbar', 'astaghfirullah', 'lailaha', 'salawat'];
+
+route('GET', '/api/dhikr', async ({ req, query }) => {
+  const { user } = requireAuth(req);
+  const d = userData(user);
+  const date = dateStr(query.get('date'));
+  return { body: { date, counts: (d.dhikr && d.dhikr[date]) || {} } };
+});
+
+route('PUT', '/api/dhikr', async ({ req, body }) => {
+  const { user } = requireAuth(req);
+  const d = userData(user);
+  const date = dateStr(body.date);
+  const counts = {};
+  for (const id of DHIKR_IDS) {
+    const n = Math.floor(Number(body.counts && body.counts[id]) || 0);
+    counts[id] = Math.min(100000, Math.max(0, n));
+  }
+  if (!d.dhikr) d.dhikr = {};
+  d.dhikr[date] = counts;
+  return { body: { date, counts } };
+});
 // ----------------------------------------------------------------
 // Static Files
 // ----------------------------------------------------------------
